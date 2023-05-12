@@ -1,0 +1,49 @@
+@startuml books
+actor User
+actor Administrator
+participant UI
+participant Catalog
+participant Cart
+participant Payment
+database StoreDatabase
+
+User -> UI: Login
+UI -> Catalog : GET/ books
+Catalog -> UI : 200
+UI -> User: Display book list
+
+=== Add book to Cart ==
+User -> UI : Select book
+UI -> Catalog: GET/ book:id
+Catalog -> UI: 200
+UI-> User: Display book details
+UI -> Cart : POST/ cart:id/book
+Cart -> Catalog : GET /book:id
+Catalog -> Cart : 200
+Cart -> UI: 201
+
+== Checkout ==
+UI -> User: Display cart contents
+User -> UI: Proceed to checkout
+UI -> Payment: Calculate total cost
+Payment -> UI: 200
+UI -> User: Display payment page
+User -> UI: Submit payment
+UI -> StoreDatabase: Process payment
+UI -> Cart: Clear cart
+UI -> User: Display confirmation page
+
+
+=== Administrator ==
+Administrator -> UI: Login as admin
+
+Administrator -> UI: Add book to store
+UI -> StoreDatabase: POST/ book
+StoreDatabase -> UI: 200
+
+Administrator -> UI: Remove book from store
+UI -> StoreDatabase: DELETE/ book:id
+StoreDatabase -> UI : 204 no content
+UI -> StoreDatabase: Delete book information
+
+@enduml
